@@ -1,10 +1,24 @@
+/// A model representing a task with its details such as name, description,
+/// creation date, due date, and completion status.
 class TaskModel {
+  /// The name of the task.
   final String name;
+
+  /// A detailed description of the task.
   final String description;
+
+  /// The date and time when the task was created.
   final DateTime creationDate;
+
+  /// The date and time by which the task should be completed.
   final DateTime dueDate;
+
+  /// Indicates whether the task has been completed.
   final bool isDone;
 
+  /// Creates a new [TaskModel] instance with the given details.
+  ///
+  /// By default, [isDone] is set to `false`.
   const TaskModel({
     required this.name,
     required this.description,
@@ -13,6 +27,9 @@ class TaskModel {
     this.isDone = false,
   });
 
+  /// Creates an empty [TaskModel] with default values.
+  ///
+  /// Useful for initializing a task model without specific data.
   factory TaskModel.empty() {
     return TaskModel(
       name: '',
@@ -22,6 +39,10 @@ class TaskModel {
     );
   }
 
+  /// Constructs a [TaskModel] from a JSON object.
+  ///
+  /// Converts date fields (`creationDate` and `dueDate`) from milliseconds since epoch
+  /// to [DateTime] objects.
   factory TaskModel.fromJson(Map<String, dynamic> json) {
     return TaskModel(
       name: json['name'],
@@ -32,6 +53,9 @@ class TaskModel {
     );
   }
 
+  /// Converts this [TaskModel] instance into a JSON-compatible format.
+  ///
+  /// Date fields (`creationDate` and `dueDate`) are converted to milliseconds since epoch.
   Map<String, dynamic> toJson() {
     return {
       'name': name,
@@ -42,64 +66,14 @@ class TaskModel {
     };
   }
 
+  /// Checks if the task is overdue and not completed.
+  ///
+  /// Returns `true` if the current date is past the due date and the task is not done.
   bool get isOverdued => dueDate.compareTo(DateTime.now()) < 0 && !isDone;
 
+  /// Returns a string representation of the task, showing its name and due date.
   @override
   String toString() {
     return '$name $dueDate';
   }
 }
-
-final tasks = [
-  TaskModel(
-    name: 'Choose a present for mama',
-    description: '''
-    I need to a present for my mom ASAP!
-    Maybe skibidi ohio rizz party fanum tax
-    quandale dingle sigma donald trump woke biden
-    zelensky daddy zelensky evangelion zelensky
-    ''',
-    creationDate: DateTime.now(),
-    dueDate: DateTime(2024, 12, 03, 18, 00),
-  ),
-  TaskModel(
-    name: 'Finish this task',
-    description: '''
-  Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-  Etiam sollicitudin sem nec vulputate fermentum. Suspendisse 
-  potenti. Aliquam luctus sed odio vitae commodo. Pellentesque
-  habitant morbi tristique senectus et netus et malesuada fames
-  ac turpis egestas. Nunc sit amet iaculis mi. In consequat sapien
-  et nibh bibendum, quis faucibus leo laoreet. Proin in sollicitudin 
-    ''',
-    creationDate: DateTime(2024, 11, 28, 13, 54),
-    dueDate: DateTime(2024, 12, 02, 12, 00),
-  ),
-  TaskModel(
-    name: 'Finish this task',
-    description: '''
-  Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-  Etiam sollicitudin sem nec vulputate fermentum. Suspendisse 
-  potenti. Aliquam luctus sed odio vitae commodo. Pellentesque
-  habitant morbi tristique senectus et netus et malesuada fames
-  ac turpis egestas. Nunc sit amet iaculis mi. In consequat sapien
-  et nibh bibendum, quis faucibus leo laoreet. Proin in sollicitudin 
-    ''',
-    creationDate: DateTime(2024, 11, 28, 13, 55),
-    dueDate: DateTime(2024, 11, 02, 12, 00),
-  ),
-  TaskModel(
-    name: 'Finish this task',
-    description: '''
-  Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-  Etiam sollicitudin sem nec vulputate fermentum. Suspendisse 
-  potenti. Aliquam luctus sed odio vitae commodo. Pellentesque
-  habitant morbi tristique senectus et netus et malesuada fames
-  ac turpis egestas. Nunc sit amet iaculis mi. In consequat sapien
-  et nibh bibendum, quis faucibus leo laoreet. Proin in sollicitudin 
-    ''',
-    creationDate: DateTime(2024, 11, 28, 13, 56),
-    dueDate: DateTime(2024, 12, 02, 12, 00),
-    isDone: true,
-  ),
-];

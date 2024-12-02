@@ -1,5 +1,17 @@
 import "package:flutter/material.dart";
 
+/// A class that provides various pre-defined themes for a Flutter application.
+///
+/// The `MaterialTheme` class offers a set of predefined color schemes and `ThemeData` objects,
+/// including light and dark themes with different contrast levels.
+/// The themes are designed to follow Material Design principles,
+/// and the class makes it easy to apply these themes in your Flutter app.
+///
+/// This class is generated using the Material Theme Builder,
+/// which allows you to customize and generate themes based on your application's design needs.
+/// For more information about the Material Theme Builder and how the themes are structured,
+/// refer to the documentation [here](https://material-foundation.github.io/material-theme-builder/).
+
 class MaterialTheme {
   final TextTheme textTheme;
 

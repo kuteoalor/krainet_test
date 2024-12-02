@@ -5,12 +5,20 @@ import 'package:krainet_test/domain/usecases/uid_usecase.dart';
 import 'package:krainet_test/presentation/pages/tasks_page/tasks_state.dart';
 import 'package:krainet_test/presentation/utils/enums.dart';
 
+/// A Cubit for managing tasks in the application.
+///
+/// The [TasksCubit] handles fetching, filtering, sorting, adding, updating,
+/// and deleting tasks. It maintains the current state of tasks and user-selected
+/// options such as filters and sorting.
 class TasksCubit extends Cubit<TasksState> {
-  final TasksUsecase _tasksUsecase;
-  final UidUsecase _uidUsecase;
+  final TasksUsecase _tasksUsecase; // Use case for handling task operations.
+  final UidUsecase _uidUsecase; // Use case for handling user ID operations.
+
+  /// Constructor to initialize the [TasksCubit] with required use cases.
   TasksCubit(this._tasksUsecase, this._uidUsecase)
       : super(const TasksState(tasks: [], displayedTasks: []));
 
+  /// Fetches tasks from the repository and updates the state.
   void getTasks() async {
     emit(
       TasksState.fromPrev(
@@ -37,6 +45,7 @@ class TasksCubit extends Cubit<TasksState> {
     }
   }
 
+  /// Updates the state based on the selected [filterOption].
   void filterOptionChanged(FilterOption filterOption) {
     var displayedTasks = switch (filterOption) {
       FilterOption.all => state.tasks,
@@ -53,6 +62,7 @@ class TasksCubit extends Cubit<TasksState> {
     );
   }
 
+  /// Updates the state based on the selected [sortOption].
   void sortOptionChanged(SortOption sortOption) {
     final displayedTasks = List<TaskModel>.from(state.displayedTasks);
     switch (sortOption) {
@@ -82,6 +92,10 @@ class TasksCubit extends Cubit<TasksState> {
     );
   }
 
+  /// Adds a new task to the list and updates the state.
+  ///
+  /// The tasks are updated on the server and re-sorted/filtered
+  /// based on the current options.
   void addTask(TaskModel task) {
     final tasks = List<TaskModel>.from(state.tasks);
     tasks.add(task);
@@ -96,6 +110,10 @@ class TasksCubit extends Cubit<TasksState> {
     filterOptionChanged(state.filterOption);
   }
 
+  /// Deletes a task from the list and updates the state.
+  ///
+  /// The tasks are updated on the server and re-filtered
+  /// based on the current filter option.
   void deleteTask(TaskModel task) {
     final tasks = List<TaskModel>.from(state.tasks);
     tasks.remove(task);
@@ -109,6 +127,10 @@ class TasksCubit extends Cubit<TasksState> {
     filterOptionChanged(state.filterOption);
   }
 
+  /// Updates a task with new values and updates the state.
+  ///
+  /// If a task's properties are modified, the changes are sent to the server,
+  /// and the tasks are re-filtered based on the current filter option.
   void updateTask({
     required TaskModel task,
     String? name,

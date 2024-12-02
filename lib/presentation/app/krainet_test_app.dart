@@ -8,16 +8,23 @@ import 'package:krainet_test/domain/usecases/uid_usecase.dart';
 import 'package:krainet_test/presentation/pages/auth_page/auth_cubit.dart';
 import 'package:krainet_test/presentation/pages/auth_page/auth_page.dart';
 import 'package:krainet_test/presentation/pages/tasks_page/tasks_cubit.dart';
-import 'package:krainet_test/presentation/theme/theme.dart';
 import 'package:krainet_test/presentation/theme/theme_cubit.dart';
 import 'package:krainet_test/presentation/utils/theme_util.dart';
 
+/// The root widget of the app.
+///
+/// This widget sets up the main app structure, including the [MaterialApp],
+/// theme handling, and BlocProviders for managing state across different parts
+/// of the app. It provides the app with access to various use cases and repositories
+/// through the Bloc pattern.
 class KrainetTestApp extends StatelessWidget {
   const KrainetTestApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        // Provides the TasksCubit, which uses the TasksUsecase and UidUsecase
         BlocProvider(
           create: (context) => TasksCubit(
             TasksUsecase(
@@ -28,9 +35,11 @@ class KrainetTestApp extends StatelessWidget {
             ),
           ),
         ),
+        // Provides the ThemeCubit, which controls the app's theme
         BlocProvider(
           create: (context) => ThemeCubit(),
         ),
+        // Provides the AuthCubit, which manages authentication-related state
         BlocProvider(
           create: (context) => AuthCubit(
             AuthUsecase(
@@ -41,37 +50,14 @@ class KrainetTestApp extends StatelessWidget {
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, state) {
+          // Builds the MaterialApp with the selected theme and the AuthPage as the home
           return MaterialApp(
             title: 'Flutter Demo',
-            theme: _getTheme(state, context),
+            theme: getTheme(state, context),
             home: const AuthPage(),
           );
         },
       ),
     );
-  }
-
-  ThemeData _getTheme(ThemeMode themeMode, BuildContext context) {
-    TextTheme textTheme = createTextTheme(context, "Inter", "Inter");
-    MaterialTheme theme = MaterialTheme(textTheme);
-    switch (themeMode) {
-      case ThemeMode.system:
-        final brightness =
-            View.of(context).platformDispatcher.platformBrightness;
-        switch (brightness) {
-          case Brightness.light:
-            BlocProvider.of<ThemeCubit>(context).updateTheme(ThemeMode.light);
-            return theme.light();
-          case Brightness.dark:
-            BlocProvider.of<ThemeCubit>(context).updateTheme(ThemeMode.dark);
-            return theme.light();
-        }
-
-      case ThemeMode.light:
-        return theme.light();
-
-      case ThemeMode.dark:
-        return theme.dark();
-    }
   }
 }

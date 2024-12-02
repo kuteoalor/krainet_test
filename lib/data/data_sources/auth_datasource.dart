@@ -4,8 +4,20 @@ import 'package:crypto/crypto.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+/// A class that handles authentication-related operations such as sign-up, sign-in, and sign-out.
+/// This class uses Firebase Authentication.
 class AuthDatasource {
+  /// Firebase Authentication service instance.
   final authService = FirebaseAuth.instance;
+
+  /// Registers a new user with the provided [email] and [password].
+  ///
+  /// - Returns a `Map` containing:
+  ///   - `status`: "success" or "error".
+  ///   - `uid` (on success): The user's unique ID.
+  ///   - `message` (on error): An error description.
+  ///
+  /// - Validates email format and hashes the password using SHA-256 before sending it to Firebase.
   Future<Map<String, String>> signUp(String email, String password) async {
     if (!EmailValidator.validate(email)) {
       return {
@@ -43,6 +55,14 @@ class AuthDatasource {
     return {};
   }
 
+  /// Logs in an existing user with the provided [email] and [password].
+  ///
+  /// - Returns a `Map` containing:
+  ///   - `status`: "success" or "error".
+  ///   - `uid` (on success): The user's unique ID.
+  ///   - `message` (on error): An error description.
+  ///
+  /// - Validates email format and hashes the password using SHA-256 before sending it to Firebase.
   Future<Map<String, String>> signIn(String email, String password) async {
     if (!EmailValidator.validate(email)) {
       return {
@@ -75,11 +95,16 @@ class AuthDatasource {
         };
       }
     } catch (_) {
-      return {'status': 'error', 'message': 'Sign iN error'};
+      return {'status': 'error', 'message': 'Sign in error'};
     }
     return {};
   }
 
+  /// Logs out the currently authenticated user.
+  ///
+  /// - Returns a `Map` containing:
+  ///   - `status`: "success" or "error".
+  ///   - `message` (on error): An error description.
   Future<Map<String, String>> signOut() async {
     try {
       await authService.signOut();
@@ -94,5 +119,8 @@ class AuthDatasource {
     }
   }
 
+  /// Retrieves the unique identifier (UID) of the currently authenticated user.
+  ///
+  /// - Throws an exception if no user is authenticated.
   String get uid => authService.currentUser!.uid;
 }

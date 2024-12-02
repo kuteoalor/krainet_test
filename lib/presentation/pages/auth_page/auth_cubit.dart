@@ -4,47 +4,43 @@ import 'package:krainet_test/presentation/pages/auth_page/auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   final AuthUsecase _authUsecase;
+
   AuthCubit(this._authUsecase) : super(AuthStateInitial(message: 'initial'));
 
+  // Sign in method
   void signIn(String email, String password) async {
     final response = await _authUsecase.signIn(email, password);
-    switch (response['status']) {
-      case 'success':
-        emit(
-          AuthStateAuthorized(message: response['uid']!),
-        );
-      case 'error':
-        emit(
-          AuthStateError(message: response['message']!),
-        );
+
+    // Handle the response status
+    if (response['status'] == 'success') {
+      emit(AuthStateAuthorized(message: response['uid'] ?? 'Unknown UID'));
+    } else {
+      emit(AuthStateError(
+          message: response['message'] ?? 'Unknown error occurred'));
     }
   }
 
+  // Sign up method
   void signUp(String email, String password) async {
     final response = await _authUsecase.signUp(email, password);
-    switch (response['status']) {
-      case 'success':
-        emit(
-          AuthStateAuthorized(message: response['uid']!),
-        );
-      case 'error':
-        emit(
-          AuthStateError(message: response['message']!),
-        );
+
+    if (response['status'] == 'success') {
+      emit(AuthStateAuthorized(message: response['uid'] ?? 'Unknown UID'));
+    } else {
+      emit(AuthStateError(
+          message: response['message'] ?? 'Unknown error occurred'));
     }
   }
 
+  // Sign out method
   void signOut() async {
     final response = await _authUsecase.signOut();
-    switch (response['status']) {
-      case 'success':
-        emit(
-          AuthStateInitial(message: 'Logged out'),
-        );
-      case 'error':
-        emit(
-          AuthStateError(message: response['message']!),
-        );
+
+    if (response['status'] == 'success') {
+      emit(AuthStateInitial(message: 'Logged out'));
+    } else {
+      emit(AuthStateError(
+          message: response['message'] ?? 'Unknown error occurred'));
     }
   }
 }

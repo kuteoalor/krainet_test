@@ -1,14 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:krainet_test/data/entities/task_model.dart';
+import 'package:krainet_test/presentation/pages/single_task_page/widgets/completed_button.dart';
 import 'package:krainet_test/presentation/pages/tasks_page/tasks_cubit.dart';
 import 'package:krainet_test/presentation/pages/single_task_page/widgets/delete_icon_button.dart';
 import 'package:krainet_test/presentation/pages/single_task_page/widgets/due_time_button.dart';
 import 'package:krainet_test/presentation/pages/single_task_page/widgets/empty_task_alert_dialog.dart';
 
+/// A page for viewing, editing, or creating a single task.
+///
+/// Displays task details such as name, description, and due date. Provides
+/// functionality for creating a new task, updating an existing task, marking
+/// a task as completed, or deleting a task.
 class SingleTaskPage extends StatefulWidget {
+  /// The task to be displayed or edited.
   final TaskModel task;
+
+  /// Indicates whether this page is used to create a new task.
+  /// If true, the page is in "create mode."
   final bool creating;
+
+  /// Constructor for SingleTaskPage.
+  ///
+  /// [task] is required and represents the task being displayed or edited.
+  /// [creating] defaults to false, indicating that the task is being edited.
   const SingleTaskPage({
     super.key,
     required this.task,
@@ -20,15 +35,22 @@ class SingleTaskPage extends StatefulWidget {
 }
 
 class _SingleTaskPageState extends State<SingleTaskPage> {
+  /// Controller for the task's name input field.
   late final TextEditingController taskNameController;
+
+  /// Controller for the task's description input field.
   late final TextEditingController taskDescriptionController;
+
+  /// Tracks whether the task's details have been modified.
   bool taskChanged = false;
-  //bool dueDateChanged = false;
+
+  /// Stores a new due date if updated.
   DateTime? newDueDate;
 
   @override
   void initState() {
     super.initState();
+    // Initialize the controllers with the task's current details.
     taskDescriptionController =
         TextEditingController(text: widget.task.description);
     taskNameController = TextEditingController(text: widget.task.name);
@@ -36,6 +58,7 @@ class _SingleTaskPageState extends State<SingleTaskPage> {
 
   @override
   void dispose() {
+    // Dispose of the controllers when the widget is removed.
     taskDescriptionController.dispose();
     taskNameController.dispose();
     super.dispose();
@@ -48,9 +71,8 @@ class _SingleTaskPageState extends State<SingleTaskPage> {
       child: PopScope(
         canPop: false,
         onPopInvokedWithResult: (didPop, result) async {
-          if (didPop) {
-            return;
-          }
+          // Handle navigation away from the page based on whether changes were made.
+          if (didPop) return;
           if (widget.creating) {
             if (!taskChanged || newDueDate == null) {
               final answer = await showDialog<bool>(
@@ -93,9 +115,7 @@ class _SingleTaskPageState extends State<SingleTaskPage> {
               onDatePicked: onNewDatePicked,
             ),
             actions: [
-              DeleteIconButton(
-                task: widget.task,
-              ),
+              DeleteIconButton(task: widget.task),
             ],
           ),
           body: Padding(
@@ -111,15 +131,14 @@ class _SingleTaskPageState extends State<SingleTaskPage> {
           ),
           persistentFooterAlignment: AlignmentDirectional.centerStart,
           persistentFooterButtons: [
-            CompletedButton(
-              task: widget.task,
-            ),
+            CompletedButton(task: widget.task),
           ],
         ),
       ),
     );
   }
 
+  /// Builds the input fields for the task's name and description.
   Column _taskInfoFields() {
     return Column(
       mainAxisSize: MainAxisSize.max,
@@ -156,7 +175,6 @@ class _SingleTaskPageState extends State<SingleTaskPage> {
             textAlign: TextAlign.start,
             controller: taskDescriptionController,
             maxLines: null,
-            minLines: null,
             expands: true,
             onChanged: (value) {
               if (!taskChanged) {
@@ -183,6 +201,7 @@ class _SingleTaskPageState extends State<SingleTaskPage> {
     );
   }
 
+  /// Returns the appropriate background color based on the task's state.
   Color _getColor() => widget.creating
       ? Theme.of(context).colorScheme.surfaceContainerLow
       : widget.task.isDone
@@ -191,6 +210,7 @@ class _SingleTaskPageState extends State<SingleTaskPage> {
               ? Theme.of(context).colorScheme.tertiaryContainer
               : Theme.of(context).colorScheme.surfaceContainerLow;
 
+  /// Returns the appropriate text color based on the task's state.
   Color _getTextColor() => widget.creating
       ? Theme.of(context).colorScheme.onSurface
       : widget.task.isDone
@@ -199,71 +219,8 @@ class _SingleTaskPageState extends State<SingleTaskPage> {
               ? Theme.of(context).colorScheme.onTertiaryContainer
               : Theme.of(context).colorScheme.onSurface;
 
+  /// Callback for updating the due date when a new date is selected.
   void onNewDatePicked(DateTime pickedDate) {
     setState(() => newDueDate = pickedDate);
-  }
-}
-
-class CompletedButton extends StatefulWidget {
-  final TaskModel task;
-  const CompletedButton({
-    super.key,
-    required this.task,
-  });
-
-  @override
-  State<CompletedButton> createState() => _CompletedButtonState();
-}
-
-class _CompletedButtonState extends State<CompletedButton> {
-  late bool isDone;
-
-  @override
-  void initState() {
-    super.initState();
-    isDone = widget.task.isDone;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return OutlinedButton(
-      onPressed: () {
-        setState(() {
-          isDone = !isDone;
-        });
-        BlocProvider.of<TasksCubit>(context).updateTask(
-          task: widget.task,
-          isDone: isDone,
-        );
-      },
-      child: isDone
-          ? const Padding(
-              padding: EdgeInsets.symmetric(vertical: 5),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Done!',
-                    style: TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  CircleAvatar(
-                    maxRadius: 13,
-                    child: Icon(Icons.check),
-                  ),
-                ],
-              ),
-            )
-          : const Text(
-              'Mark as done',
-              style: TextStyle(
-                fontSize: 16,
-              ),
-            ),
-    );
   }
 }

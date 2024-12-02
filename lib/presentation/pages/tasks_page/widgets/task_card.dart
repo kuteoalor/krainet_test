@@ -7,8 +7,14 @@ import 'package:krainet_test/presentation/pages/tasks_page/tasks_cubit.dart';
 import 'package:krainet_test/presentation/shared_widgets/delete_dialog.dart';
 import 'package:krainet_test/presentation/pages/tasks_page/widgets/done_chip.dart';
 
+/// A widget that represents a single task card, displaying its details and actions.
+///
+/// The `TaskCard` supports navigation to a detailed task page, long-press deletion,
+/// and various visual states for completed, overdue, or pending tasks.
 class TaskCard extends StatelessWidget {
+  /// The task to be displayed in this card.
   final TaskModel task;
+
   const TaskCard(
     this.task, {
     super.key,
@@ -17,11 +23,13 @@ class TaskCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Hero(
+      /// Creates a shared element transition for the task card.
       tag: task.creationDate,
       child: Material(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         color: _getColor(context),
         child: InkWell(
+          /// Navigates to the single task detail page when tapped.
           onTap: () {
             Navigator.of(context).push(
               PageRouteBuilder(
@@ -31,6 +39,8 @@ class TaskCard extends StatelessWidget {
               ),
             );
           },
+
+          /// Prompts the user with a delete confirmation dialog when long-pressed.
           onLongPress: () async {
             final answer = await showDialog(
               context: context,
@@ -43,6 +53,7 @@ class TaskCard extends StatelessWidget {
             }
           },
           child: Container(
+            /// Styles the task card with a border and padding.
             decoration: BoxDecoration(
               border: Border.all(
                 color: Theme.of(context).colorScheme.onSurface,
@@ -57,6 +68,7 @@ class TaskCard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
+                      /// Displays the task name.
                       Text(
                         task.name,
                         style: TextStyle(
@@ -66,6 +78,8 @@ class TaskCard extends StatelessWidget {
                         ),
                       ),
                       const Spacer(),
+
+                      /// Displays the formatted creation date of the task.
                       Text(
                         formattedCreationDate,
                         style: TextStyle(
@@ -77,6 +91,8 @@ class TaskCard extends StatelessWidget {
                   const SizedBox(
                     height: 10,
                   ),
+
+                  /// Displays the task description with ellipsis for overflow.
                   Text(
                     task.description,
                     maxLines: 3,
@@ -92,8 +108,11 @@ class TaskCard extends StatelessWidget {
                   ),
                   Row(
                     children: [
+                      /// Displays a "Done" chip if the task is completed.
                       task.isDone ? const DoneChip() : const SizedBox(),
                       const Spacer(),
+
+                      /// Displays the formatted due date of the task.
                       Text(
                         formattedDueDate,
                         style: TextStyle(
@@ -111,6 +130,9 @@ class TaskCard extends StatelessWidget {
     );
   }
 
+  /// Returns a formatted string for the task's creation date.
+  ///
+  /// The format changes depending on whether the creation date is in the current year.
   String get formattedCreationDate {
     final formatString = task.creationDate.year == DateTime.now().year
         ? 'MMM dd'
@@ -119,6 +141,9 @@ class TaskCard extends StatelessWidget {
     return DateFormat(formatString).format(task.creationDate);
   }
 
+  /// Returns a formatted string for the task's due date, including time.
+  ///
+  /// The format changes depending on whether the due date is in the current year.
   String get formattedDueDate {
     final formatString = task.dueDate.year == DateTime.now().year
         ? 'MMM dd, '
@@ -127,12 +152,22 @@ class TaskCard extends StatelessWidget {
         '${DateFormat.Hm().format(task.dueDate)}';
   }
 
+  /// Determines the background color of the task card based on its state.
+  ///
+  /// - Returns a secondary container color if the task is completed.
+  /// - Returns a tertiary container color if the task is overdue.
+  /// - Returns a surface container color for other tasks.
   Color _getColor(BuildContext context) => task.isDone
       ? Theme.of(context).colorScheme.secondaryContainer
       : task.isOverdued
           ? Theme.of(context).colorScheme.tertiaryContainer
           : Theme.of(context).colorScheme.surfaceContainerLow;
 
+  /// Determines the text color of the task card based on its state.
+  ///
+  /// - Returns a secondary container text color if the task is completed.
+  /// - Returns a tertiary container text color if the task is overdue.
+  /// - Returns a surface text color for other tasks.
   Color _getTextColor(BuildContext context) => task.isDone
       ? Theme.of(context).colorScheme.onSecondaryContainer
       : task.isOverdued

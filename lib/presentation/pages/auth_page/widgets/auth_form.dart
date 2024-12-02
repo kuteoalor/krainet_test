@@ -5,8 +5,16 @@ import 'package:krainet_test/presentation/pages/auth_page/auth_state.dart';
 import 'package:krainet_test/presentation/pages/auth_page/widgets/auth_input_field.dart';
 import 'package:krainet_test/presentation/pages/tasks_page/tasks_page.dart';
 
+/// A StatefulWidget that manages user authentication form for sign in or sign up.
+///
+/// The form dynamically switches between the login and registration modes based on
+/// the `isRegister` flag passed during initialization. It provides fields for email,
+/// password, and confirm password (for registration). It also validates the input
+/// and interacts with the `AuthCubit` to handle authentication actions.
 class AuthorizationForm extends StatefulWidget {
-  final bool isRegister;
+  final bool
+      isRegister; // Flag to determine if the form is for registration or sign-in
+
   const AuthorizationForm({
     super.key,
     required this.isRegister,
@@ -20,25 +28,30 @@ class _AuthorizationFormState extends State<AuthorizationForm> {
   late final TextEditingController emailController;
   late final TextEditingController passwordController;
   late final TextEditingController confirmPasswordController;
-  bool isValidEmail = false;
-  bool isValidPassword = false;
-  late bool isValidConfirmPassword;
+  bool isValidEmail = false; // Flag to track if email is valid
+  bool isValidPassword = false; // Flag to track if password is valid
+  late bool
+      isValidConfirmPassword; // Flag for confirm password (only for registration)
 
   @override
   void initState() {
     super.initState();
+    // Initialize controllers for form fields
     emailController = TextEditingController();
     passwordController = TextEditingController();
+
+    // If it's a registration form, initialize confirm password controller
     if (widget.isRegister) {
       confirmPasswordController = TextEditingController();
       isValidConfirmPassword = false;
     } else {
-      isValidConfirmPassword = true;
+      isValidConfirmPassword = true; // No confirm password for sign-in
     }
   }
 
   @override
   void dispose() {
+    // Dispose the controllers when the widget is removed
     emailController.dispose();
     passwordController.dispose();
     if (widget.isRegister) {
@@ -51,6 +64,7 @@ class _AuthorizationFormState extends State<AuthorizationForm> {
   Widget build(BuildContext context) {
     return BlocListener<AuthCubit, AuthState>(
       listener: (context, state) {
+        // Navigate to TasksPage upon successful login or registration
         if (state is AuthStateAuthorized) {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
@@ -58,6 +72,7 @@ class _AuthorizationFormState extends State<AuthorizationForm> {
             ),
           );
         } else if (state is AuthStateError) {
+          // Show an error message if authentication fails
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Error: ${state.message}'),
@@ -76,6 +91,7 @@ class _AuthorizationFormState extends State<AuthorizationForm> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  // Email input field with validation
                   AuthInputField(
                     hintText: 'Email',
                     controller: emailController,
@@ -97,6 +113,7 @@ class _AuthorizationFormState extends State<AuthorizationForm> {
                   const SizedBox(
                     height: 10,
                   ),
+                  // Password input field with validation
                   AuthInputField(
                     hintText: 'Password',
                     obscureText: true,
@@ -117,6 +134,7 @@ class _AuthorizationFormState extends State<AuthorizationForm> {
                   const SizedBox(
                     height: 10,
                   ),
+                  // Confirm Password field (only shown for registration)
                   if (widget.isRegister)
                     AuthInputField(
                       controller: confirmPasswordController,
@@ -143,6 +161,7 @@ class _AuthorizationFormState extends State<AuthorizationForm> {
                   const SizedBox(
                     height: 30,
                   ),
+                  // Submit button for either login or register
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -150,6 +169,7 @@ class _AuthorizationFormState extends State<AuthorizationForm> {
                               isValidPassword &&
                               isValidConfirmPassword
                           ? () {
+                              // Trigger the appropriate action based on the form mode
                               if (widget.isRegister) {
                                 BlocProvider.of<AuthCubit>(context).signUp(
                                   emailController.text,
